@@ -9,6 +9,8 @@ def kp120900kp120900(self):
     self.csw          = 'c2p6500'
     self.L            = 32
     self.lmbstring    = 'lp025'
+    self.lmblist      = ['lp0001', 'lp001', 'lp005', 'lp01', 'lp02', 'lp04', 'lp08']
+    self.lmbvals      = [0.0001, 0.001, 0.005, 0.01, 0.02, 0.04, 0.08]
     self.almb         = 2.5e-2
     self.a            = 0.074
     self.baryons      = {"proton" : ["p", [2/3, -1/3], [(-0.2,1.2), (-0.1,1.1), (-0.4,0.7), (-0.1,1.1), (-0.1,1.1)]], #Baryon type, electric charge, ylimits GE, GM, GE/GM, F1, F2

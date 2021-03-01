@@ -66,12 +66,6 @@ class Aexp:
     def eval_2(self,x,p0, p1):
         """evaluate"""
         return p0*np.exp(-x*p1)
-    def dereval(self,x,p,pe,v):
-        """evaluate the derivative"""
-        # v is the off-diagonal parts of the correlation matrix between fit parameters. May need fixing at some stage
-        eA=np.exp(-x*p[1])
-        eB=-x*p[0]*eA
-        return np.sqrt(pe[0]**2*eA**2+2*pe[0]*pe[1]*v[0]*eA*eB+pe[1]**2*eB**2)
 
 ############################################################
 #

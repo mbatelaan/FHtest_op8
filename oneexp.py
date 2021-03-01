@@ -437,8 +437,10 @@ def effamp(pars, ydata, plot=False,timeslice=10, FH=False):
 
 def makeratio(nclns, opnum):
     """Construct the ratio of correlators"""
-    ratiou = stats.feynhellratioshort(nclns[1][0], nclns[0][0])
-    ratiod = stats.feynhellratioshort(nclns[2][0], nclns[0][0])
+    ratiou = stats.feynhellratio(nclns[1][0], nclns[0][1], nclns[0][0], nclns[1][1])
+    ratiod = stats.feynhellratio(nclns[2][0], nclns[0][1], nclns[0][0], nclns[2][1])
+    # ratiou = stats.feynhellratioshort(nclns[1][0], nclns[0][0])
+    # ratiod = stats.feynhellratioshort(nclns[2][0], nclns[0][0])
     ratios = [ratiou, ratiod]
     # Take the average of the (pos. parity, trev=0) and (neg parity, trev=1) two-point functions to get an energy value
     unpert_2p =[]
@@ -460,12 +462,10 @@ if __name__ == "__main__":
         
         momentum     = int(sys.argv[1])
         kappas       = int(sys.argv[2])
-        lambdachoice = int(sys.argv[3])
         sinktype=0
         pars = pr.params(kappas, sinktype, momentum)
         pars.fit = 'Aexp'
         pars.makeresultdir(plots=True)
-        pars.lmbstring = ['lp025', 'lp05'][lambdachoice]
 
         # Set the range of tmin values to use
         # pars.tminmin = 10 #5
@@ -474,22 +474,54 @@ if __name__ == "__main__":
         print("------------------------------",pars.momfold[pars.momentum][:7],"------------------------------")
         opnum=0
         fitfunction  = ff.initffncs(pars.fit) #Initialise the fitting function
+
+        # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # for lmbstring in [pars.lmblist[-1]]:
+        for lmbstring in pars.lmblist:
+            pars.lmbstring = lmbstring
+            print(pars.lmbstring)
+            nucleon_data = read_data(pars)
+            ratios, unpert_2p = makeratio(nucleon_data,opnum)
+            dictenergy, dictenergyshift = oneexpfitter(ratios, unpert_2p, fitfunction, pars, opnum, plots=0)
         
-        pars.lmbstring = 'lp025'
-        # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        nucleon_datalp025 = read_data(pars)
-        ratioslp025, unpert_2plp025 = makeratio(nucleon_datalp025,opnum)
-        dictenergylp025, dictenergyshiftlp025 = oneexpfitter(ratioslp025, unpert_2plp025, fitfunction, pars, opnum, plots=0)
+        # pars.lmbstring = 'lp001'
+        # print(pars.lmbstring)
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp001 = read_data(pars)
+        # ratioslp001, unpert_2plp001 = makeratio(nucleon_datalp001,opnum)
+        # dictenergylp001, dictenergyshiftlp001 = oneexpfitter(ratioslp001, unpert_2plp001, fitfunction, pars, opnum, plots=0)
 
-        pars.lmbstring = 'lp05'
-        # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        nucleon_datalp05 = read_data(pars)
-        ratioslp05, unpert_2plp05 = makeratio(nucleon_datalp05,opnum)
-        dictenergylp05, dictenergyshiftlp05 = oneexpfitter(ratioslp05, unpert_2plp05, fitfunction, pars, opnum, plots=0)
+        # pars.lmbstring = 'lp01'
+        # print(pars.lmbstring)
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp01 = read_data(pars)
+        # ratioslp01, unpert_2plp01 = makeratio(nucleon_datalp01,opnum)
+        # dictenergylp01, dictenergyshiftlp01 = oneexpfitter(ratioslp01, unpert_2plp01, fitfunction, pars, opnum, plots=0)
 
+        # pars.lmbstring = 'lp02'
+        # print(pars.lmbstring)
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp02 = read_data(pars)
+        # ratioslp02, unpert_2plp02 = makeratio(nucleon_datalp02,opnum)
+        # dictenergylp02, dictenergyshiftlp02 = oneexpfitter(ratioslp02, unpert_2plp02, fitfunction, pars, opnum, plots=0)
+        
+        # pars.lmbstring = 'lp04'
+        # print(pars.lmbstring)
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp04 = read_data(pars)
+        # ratioslp04, unpert_2plp04 = makeratio(nucleon_datalp04,opnum)
+        # dictenergylp04, dictenergyshiftlp04 = oneexpfitter(ratioslp04, unpert_2plp04, fitfunction, pars, opnum, plots=0)
+        
+        # pars.lmbstring = 'lp08'
+        # print(pars.lmbstring)
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp08 = read_data(pars)
+        # ratioslp08, unpert_2plp08 = makeratio(nucleon_datalp08,opnum)
+        # dictenergylp08, dictenergyshiftlp08 = oneexpfitter(ratioslp08, unpert_2plp08, fitfunction, pars, opnum, plots=0)
+        
         # Function which plots results from both lambdas on the same plot, for
-        quarknum = 0 #up quark
-        plotratios(ratioslp025, ratioslp05, dictenergyshiftlp025[quarknum], dictenergyshiftlp05[quarknum], fitfunction, pars, opnum, quarknum)
+        # quarknum = 0 #up quark
+        # plotratios(ratioslp025, ratioslp01, dictenergyshiftlp025[quarknum], dictenergyshiftlp01[quarknum], fitfunction, pars, opnum, quarknum)
         
         print('script time: \t', tm.time()-start)
     else:

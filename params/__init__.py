@@ -18,20 +18,20 @@ class params:
         self.kappas     = kappas
         self.sinktype   = sinktype
         self.momentum   = momentum
-        self.basedir    = '/home/mischa/Documents/PhD/analysis_results/FHtest/'
+        self.basedir    = '/home/mischa/Documents/PhD/analysis_results/FHtest_op8/'
         self.nboot      = 500 #700
         self.nbin       = 1 #10
         self.confidence = 68
         self.xlim       = 32
-        self.colors     = ['b', 'r', 'y', 'k', 'g', 'm']
+        self.colors     = ['b', 'r', 'y', 'k', 'g', 'm', 'c']
         self.markers    = ['s','o','^','*', 'v', '>', '<']
         self.quarks     = ['u','d']
-        self.operators  = ['g35']
+        self.operators  = ['g4']
         self.opchoice   = [0]
-        self.tminmin     = 3
+        self.tminmin     = 3#3
         self.tminmax     = 14
-        self.tmaxmin     = 11
-        self.tmaxmax     = 18
+        self.tmaxmin     = 12
+        self.tmaxmax     = 16
         self.ff_number   = 0
         self.datafiles = ['Ratio_fit', 'One-exp_fit', 'corr_fit', 'combined_corr_fit', 'wa_weightedavg']
 
@@ -57,15 +57,13 @@ class params:
             # self.kp122005kp122005lp001 #18
             ]
         self.latticefn[self.kappas]()
-
-        if self.kappas==18: # So that this doesn't overwrite the lambda=1e-4 data.
-            self.workdir    = self.basedir+self.beta+self.lattice[-17:-1]+self.csw+'/'+self.kappa+self.snkfold[0]+'lp001'+'/'  # Folder for the current lattice and sink type
-        else:
-            self.workdir    = self.basedir+self.beta+self.lattice[-17:-1]+self.csw+'/'+self.kappa+self.snkfold[0]+'/'  # Folder for the current lattice and sink type
+        
+        self.workdir    = self.basedir+self.beta+self.lattice[-17:-1]+self.csw+'/'+self.kappa+self.snkfold[0]+'/'  # Folder for the current lattice and sink type
 
         # Folders for pandapickle:
         # self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/FHtest2/'  # folder with evxpt resultdump files
-        self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/Feyn-Hell_kp120900kp120900/clover_nf2p1_feyn-hell/b5p50kp120900kp120900c2p6500-32x64/nucleon/kp120900kp120900/mass/rel/FHtest2/'
+        # self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/Feyn-Hell_kp120900kp120900/clover_nf2p1_feyn-hell/b5p50kp120900kp120900c2p6500-32x64/nucleon/kp120900kp120900/mass/rel/FHtest2/'
+        self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/Feyn-Hell_kp120900kp120900/clover_nf2p1_feyn-hell/b5p50kp120900kp120900c2p6500_g8-32x64/nucleon/kp120900kp120900/mass/'
         # self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/FHtest2/'  # folder with evxpt resultdump files
         self.sinkfold     = self.beta+self.lattice[-17:-1]+self.csw+self.snkfold[0]+'-'+self.geom+'/nucleon/'+self.kappa+'/'  # Location of the unperturbed correlators
         

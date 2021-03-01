@@ -1,4 +1,3 @@
-# -*- eval: (comment-tags-mode) -*-
 # Read the fit files from the oneexp fit script and Plot the effective energy shift for multiple lambda values
 # also plot value of the weighted average of the fits with the fitrange of the fit which got the highest weighting.
 import numpy as np
@@ -221,25 +220,25 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     print(f"{np.average(avgdE_lp025)=}")
     print(f"{np.std(avgdE_lp025, ddof=1)=}")
 
-    #lp05
-    weights_dE_lp05 = weights([dictenergyshift2[i]['dof'] for i in dictenergyshift2]
+    #lp01
+    weights_dE_lp01 = weights([dictenergyshift2[i]['dof'] for i in dictenergyshift2]
                             , [dictenergyshift2[i]['chisq'] for i in dictenergyshift2]
                             , [np.std(dictenergyshift2[i]['E0'], ddof=1) for i in dictenergyshift2] )
-    weighted_dE_lp05 = (np.array(weights_dE_lp05)*np.array([dictenergyshift2[i]['E0'] for i in dictenergyshift2]).T).T
-    avgdE_lp05 = np.sum(weighted_dE_lp05, axis=0)
-    meanavgdE_lp05 = np.average(avgdE_lp05)
-    staterrsq_dE = np.std(avgdE_lp05,ddof=1)**2
+    weighted_dE_lp01 = (np.array(weights_dE_lp01)*np.array([dictenergyshift2[i]['E0'] for i in dictenergyshift2]).T).T
+    avgdE_lp01 = np.sum(weighted_dE_lp01, axis=0)
+    meanavgdE_lp01 = np.average(avgdE_lp01)
+    staterrsq_dE = np.std(avgdE_lp01,ddof=1)**2
     # The square of the differences of each fit mean to the weighted average mean
-    mean_diff = np.array([(np.average(dictenergyshift2[i]['E0'])-meanavgdE_lp05)**2 for i in dictenergyshift2])
+    mean_diff = np.array([(np.average(dictenergyshift2[i]['E0'])-meanavgdE_lp01)**2 for i in dictenergyshift2])
     # The systematic error due to taking multiple fit results in the average
-    systerrsq_dE = np.sum(weights_dE_lp05*mean_diff)
+    systerrsq_dE = np.sum(weights_dE_lp01*mean_diff)
     # The combined error includes the statistical and systematic uncertainty
     comberr_dE = np.sqrt(staterrsq_dE+systerrsq_dE)
     # Rescale the bootstrap values such that the standard deviation of the bootstrap values is equal to the combined error, without changing the mean value of the bootstraps
-    for nboot in range(len(avgdE_lp05)):
-        avgdE_lp05[nboot] = meanavgdE_lp05+(avgdE_lp05[nboot]-meanavgdE_lp05)*comberr_dE/(staterrsq_dE**(0.5))
-    print(f"{np.average(avgdE_lp05)=}")
-    print(f"{np.std(avgdE_lp05, ddof=1)=}")
+    for nboot in range(len(avgdE_lp01)):
+        avgdE_lp01[nboot] = meanavgdE_lp01+(avgdE_lp01[nboot]-meanavgdE_lp01)*comberr_dE/(staterrsq_dE**(0.5))
+    print(f"{np.average(avgdE_lp01)=}")
+    print(f"{np.std(avgdE_lp01, ddof=1)=}")
 
     
     #lp025
@@ -264,12 +263,12 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     fitBSlower = fitBSavg - fitBSstd
     fitBSupper = fitBSavg + fitBSstd
 
-    #lp05
+    #lp01
     # Get the index of the fit with the chi-squared value closest to 1
     # index2 = min(dictenergyshift2, key=(lambda x : abs(dictenergyshift2[x]['chisq']-1) ) )
-    bestweight2 = np.argsort(weights_dE_lp05)[-1]
+    bestweight2 = np.argsort(weights_dE_lp01)[-1]
     print(f"{bestweight2=}")
-    print(f"{weights_dE_lp05[bestweight2]=}")
+    print(f"{weights_dE_lp01[bestweight2]=}")
     print(f"{dictenergyshift2[bestweight2]['chisq']=}")
     print(f"{dictenergyshift2[bestweight2]['dof']=}")
     print(f"{dictenergyshift2[bestweight2]['tmin']=}")
@@ -278,8 +277,8 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     fitrange2   = np.arange(dictenergyshift2[index2]['tmin'], dictenergyshift2[index2]['tmax'])
     redchisq2   = dictenergyshift2[index2]['chisq']
     # fitBS2=np.array([stats.effmass(fitfnc.eval(time[:pars.xlim], [dictenergyshift2[index2]['A0'][nbo], dictenergyshift2[index2]['E0'][nbo]] )) for nbo in range(len(dictenergyshift2[index2]['A0'])) ])
-    # fitBS2=np.array([avgdE_lp05*time[:pars.xlim] for nbo in range(len(avgdE_lp05)) ])
-    fitBS2=np.array([avgdE_lp05 for  i in time[:pars.xlim]]).T
+    # fitBS2=np.array([avgdE_lp01*time[:pars.xlim] for nbo in range(len(avgdE_lp01)) ])
+    fitBS2=np.array([avgdE_lp01 for  i in time[:pars.xlim]]).T
     print(f"{np.shape(fitBS2)=}")
     fitBSavg2   = np.average(fitBS2,axis=0)
     fitBSstd2   = fitBS2.std(axis=0, ddof=1)
@@ -289,7 +288,7 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     #lp025
     yavgeff1 = np.array([y.Avg for y in stats.effectivemass(ratios1[quarknum])])
     yerreff1 = np.array([y.Std for y in stats.effectivemass(ratios1[quarknum])])
-    #lp05
+    #lp01
     yavgeff2 = np.array([y.Avg for y in stats.effectivemass(ratios2[quarknum])])
     yerreff2 = np.array([y.Std for y in stats.effectivemass(ratios2[quarknum])])
     
@@ -299,13 +298,13 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     fitrangelp025 = np.arange(pars.tminmin,pars.tmaxmax)
     pypl.plot(fitrangelp025+0.5,fitBSavg[fitrangelp025], linestyle='-', color='k')#, label="OneExp fit $\chi^2=${:0.2f}".format(redchisq))
     pypl.fill_between(fitrangelp025+0.5, fitBSlower[fitrangelp025], fitBSupper[fitrangelp025], color='k', alpha=0.3, linewidth=0)
-    #lp05
-    pypl.errorbar(efftime[:pars.xlim], yavgeff2[:pars.xlim], yerreff2[:pars.xlim], fmt='.', capsize=4, elinewidth=1, color='b', marker=pars.markers[pars.sink], markerfacecolor='none', label=r'$\lambda=0.05$')
+    #lp01
+    pypl.errorbar(efftime[:pars.xlim], yavgeff2[:pars.xlim], yerreff2[:pars.xlim], fmt='.', capsize=4, elinewidth=1, color='b', marker=pars.markers[pars.sink], markerfacecolor='none', label=r'$\lambda=0.01$')
     # pypl.plot(fitrange2[:-1]+0.5,fitBSavg2[fitrange2[:-1]], linestyle='-', color=pars.colors[2], label="OneExp fit $\chi^2=${:0.2f}".format(redchisq2))
     # pypl.fill_between(fitrange2[:-1]+0.5, fitBSlower2[fitrange2[:-1]], fitBSupper2[fitrange2[:-1]], color=pars.colors[2], alpha=0.3, linewidth=0)
-    fitrangelp05 = np.arange(pars.tminmin,pars.tmaxmax)
-    pypl.plot(fitrangelp05+0.5,fitBSavg2[fitrangelp05], linestyle='-', color='b')#, label="OneExp fit $\chi^2=${:0.2f}".format(redchisq2))
-    pypl.fill_between(fitrangelp05+0.5, fitBSlower2[fitrangelp05], fitBSupper2[fitrangelp05], color='b', alpha=0.3, linewidth=0)
+    fitrangelp01 = np.arange(pars.tminmin,pars.tmaxmax)
+    pypl.plot(fitrangelp01+0.5,fitBSavg2[fitrangelp01], linestyle='-', color='b')#, label="OneExp fit $\chi^2=${:0.2f}".format(redchisq2))
+    pypl.fill_between(fitrangelp01+0.5, fitBSlower2[fitrangelp01], fitBSupper2[fitrangelp01], color='b', alpha=0.3, linewidth=0)
 
     # indicate timeranges
     pypl.fill_between(np.arange(0,pars.tminmin+1), -100, 100, color='k', alpha=0.2, linewidth=0)
@@ -318,6 +317,82 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     pypl.ylabel(r'$dE_{'+['u','d'][quarknum]+', \gamma_{'+op[1:]+'}}$',labelpad=5,fontsize=18)
     pypl.title(r'Energy shift '+pars.momfold[pars.momentum][:7]+r', $\gamma_{'+op[1:]+r'}$')
     pypl.ylim([[-0.02,0.18],[-0.05,0.02]][quarknum])
+    # pypl.ylim([[-0.0002,0.0018],[-0.0005,0.0002]][quarknum])
+    pypl.xlim(0,28)
+    pypl.legend(fontsize='small')
+    pypl.grid(True, alpha=0.4)
+    ax = pypl.gca()
+    pypl.subplots_adjust(bottom=0.17, top=.91, left=0.16, right=0.93)
+    pypl.savefig(fold + 'Eff_dEshift_' + pars.momfold[pars.momentum][:7] + pars.snkfold[pars.sink] +'_'+op+'q'+str(quarknum+1)+'.pdf')
+    pypl.show()
+    pypl.close()
+    return 
+
+def plotratiosloop(ratiolist, dictenergyshift, fitfnc, pars, opnum, quarknum):
+    """ Plot the effective mass of the ratio of correlators for both lambdas and plot their fits """
+    op      = pars.operators[opnum]
+    fold    = pars.plot_dir[opnum][0]+'../'
+    time    = np.arange(0,len(ratiolist[-1][quarknum]))
+    efftime = time[:-1]+0.5
+
+    pypl.figure(figsize=(9,6))
+
+    for lmbnum, lmb in enumerate(pars.lmblist):
+        print(f"{lmb=}")
+        #INFO: Calculate weights for each fit here.(in functions)
+        weights_dE = weights([dictenergyshift[lmbnum][i]['dof'] for i in dictenergyshift[lmbnum]]
+                                , [dictenergyshift[lmbnum][i]['chisq'] for i in dictenergyshift[lmbnum]]
+                                , [np.std(dictenergyshift[lmbnum][i]['E0'], ddof=1) for i in dictenergyshift[lmbnum]] )
+        weighted_dE = (np.array(weights_dE)*np.array([dictenergyshift[lmbnum][i]['E0'] for i in dictenergyshift[lmbnum]]).T).T
+        avgdE = np.sum(weighted_dE, axis=0)
+        meanavgdE = np.average(avgdE)
+        # print(f"{np.array([dictenergyshift[lmbnum][i]['E0'] for i in dictenergyshift[lmbnum]])=}")
+        # print(f"{meanavgdE=}")
+        staterrsq_dE = np.std(avgdE,ddof=1)**2
+        # The square of the differences of each fit mean to the weighted average mean
+        mean_diff = np.array([(np.average(dictenergyshift[lmbnum][i]['E0'])-meanavgdE)**2 for i in dictenergyshift[lmbnum]])
+        # The systematic error due to taking multiple fit results in the average
+        systerrsq_dE = np.sum(weights_dE*mean_diff)
+        # The combined error includes the statistical and systematic uncertainty
+        comberr_dE = np.sqrt(staterrsq_dE+systerrsq_dE)
+        # Rescale the bootstrap values such that the standard deviation of the bootstrap values is equal to the combined error, without changing the mean value of the bootstraps
+        for nboot in range(len(avgdE)):
+            avgdE[nboot] = meanavgdE+(avgdE[nboot]-meanavgdE)*comberr_dE/(staterrsq_dE**(0.5))
+
+        # Get the index of the fit with the chi-squared value closest to 1
+        bestweight1 = np.argsort(weights_dE)[-1]
+        index = bestweight1
+        fitrange   = np.arange(dictenergyshift[lmbnum][index]['tmin'], dictenergyshift[lmbnum][index]['tmax'])
+        redchisq   = dictenergyshift[lmbnum][index]['chisq']
+        fitBS=np.array([avgdE for  i in time[:pars.xlim]]).T
+        fitBSavg   = np.average(fitBS,axis=0)
+        fitBSstd   = fitBS.std(axis=0, ddof=1)
+        fitBSlower = fitBSavg - fitBSstd
+        fitBSupper = fitBSavg + fitBSstd
+
+        yavgeff1 = np.array([y.Avg for y in stats.effectivemass(ratiolist[lmbnum][quarknum])])
+        yerreff1 = np.array([y.Std for y in stats.effectivemass(ratiolist[lmbnum][quarknum])])
+
+        pypl.errorbar(efftime[:pars.xlim], yavgeff1[:pars.xlim]/pars.lmbvals[lmbnum], yerreff1[:pars.xlim]/pars.lmbvals[lmbnum], fmt='.', capsize=4, elinewidth=1, color=pars.colors[lmbnum], marker=pars.markers[pars.sink], markerfacecolor='none', label=r'$\lambda='+str(pars.lmbvals[lmbnum])+'$')
+        # fitrange = np.arange(pars.tminmin,pars.tmaxmax)
+        pypl.plot(fitrange+0.5,fitBSavg[fitrange]/pars.lmbvals[lmbnum], linestyle='-', color=pars.colors[lmbnum])#, label="OneExp fit $\chi^2=${:0.2f}".format(redchisq))
+        pypl.fill_between(fitrange+0.5, fitBSlower[fitrange]/pars.lmbvals[lmbnum], fitBSupper[fitrange]/pars.lmbvals[lmbnum], color=pars.colors[lmbnum], alpha=0.3, linewidth=0)
+
+    # indicate timeranges
+    pypl.fill_between(np.arange(0,pars.tminmin+1), -100, 100, color='k', alpha=0.2, linewidth=0)
+    pypl.fill_between(np.arange(pars.tmaxmax,32), -100, 100, color='k', alpha=0.2, linewidth=0)
+    # pypl.fill_between(np.arange(-1,pars.tminmax), -100, 100, color='k', alpha=0.2, linewidth=0)
+    # pypl.fill_between(np.arange(pars.tmaxmin,32), -100, 100, color='k', alpha=0.2, linewidth=0)
+
+    pypl.legend(fontsize='x-small')
+    pypl.xlabel(r'$\textrm{t/a}$',labelpad=14,fontsize=18)
+    pypl.ylabel(r'$\Delta E_{'+['u','d'][quarknum]+', \gamma_{'+op[1:]+'}}/\lambda$',labelpad=5,fontsize=18)
+    pypl.title(r'Energy shift '+pars.momfold[pars.momentum][:7]+r', $\gamma_{'+op[1:]+r'}$')
+    pypl.ylim([[-5,-1.9],[-3.3,-0.9]][quarknum])
+    # pypl.ylim([[-2.5,0.01],[-1.3,0.01]][quarknum])
+    # pypl.ylim([[-0.12,0.01],[-0.12,0.01]][quarknum])
+    # pypl.ylim([[-0.02,0.18],[-0.05,0.02]][quarknum])
+    # pypl.ylim([[-0.0002,0.0018],[-0.0005,0.0002]][quarknum])
     pypl.xlim(0,28)
     pypl.legend(fontsize='small')
     pypl.grid(True, alpha=0.4)
@@ -329,32 +404,56 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     return 
 
 
+def plotlambdadep(dictenergyshift, pars, opnum, quarknum):
+    """ Plot the effective mass of the ratio of correlators for both lambdas and plot their fits """
+    op      = pars.operators[opnum]
+    fold    = pars.plot_dir[opnum][0]+'../'
 
-def writeBS(filename, headernames, bootstraps):
-    """filename to be written to, headernames to print in the first row, bootstraps a list of bootstrap elements of the same length as headernames."""
-    with open(filename,'w') as csvfile:
-        datawrite = csv.writer(csvfile,delimiter=',',quotechar='|')
-        datawrite.writerow(headernames)
-        for i in range(bootstraps[-1].nboot):
-            datawrite.writerow([bs.values[i] for bs in bootstraps])
-    return
+    pypl.figure(figsize=(9,6))
+    energies = []
+    energieserr = []
+    for lmbnum, lmb in enumerate(pars.lmblist):
+        print(f"{lmb=}")
+        #INFO: Calculate weights for each fit here.(in functions)
+        weights_dE = weights([dictenergyshift[lmbnum][i]['dof'] for i in dictenergyshift[lmbnum]]
+                                , [dictenergyshift[lmbnum][i]['chisq'] for i in dictenergyshift[lmbnum]]
+                                , [np.std(dictenergyshift[lmbnum][i]['E0'], ddof=1) for i in dictenergyshift[lmbnum]] )
+        weighted_dE = (np.array(weights_dE)*np.array([dictenergyshift[lmbnum][i]['E0'] for i in dictenergyshift[lmbnum]]).T).T
+        avgdE = np.sum(weighted_dE, axis=0)
+        meanavgdE = np.average(avgdE)
+        staterrsq_dE = np.std(avgdE,ddof=1)**2
+        # The square of the differences of each fit mean to the weighted average mean
+        mean_diff = np.array([(np.average(dictenergyshift[lmbnum][i]['E0'])-meanavgdE)**2 for i in dictenergyshift[lmbnum]])
+        # The systematic error due to taking multiple fit results in the average
+        systerrsq_dE = np.sum(weights_dE*mean_diff)
+        # The combined error includes the statistical and systematic uncertainty
+        comberr_dE = np.sqrt(staterrsq_dE+systerrsq_dE)
+        # Rescale the bootstrap values such that the standard deviation of the bootstrap values is equal to the combined error, without changing the mean value of the bootstraps
+        for nboot in range(len(avgdE)):
+            avgdE[nboot] = meanavgdE+(avgdE[nboot]-meanavgdE)*comberr_dE/(staterrsq_dE**(0.5))
+        stdavgdE = np.std(avgdE, ddof=1)
+        energies.append(meanavgdE)
+        energieserr.append(stdavgdE)
 
-def writedata(filename, headernames, data):
-    """filename to be written to, headernames to print in the first row, data of same length as headernames"""
-    with open(filename,'w') as csvfile:
-        datawrite = csv.writer(csvfile,delimiter=',',quotechar='|')
-        datawrite.writerow(headernames)
-        datawrite.writerow(data)
-    return
+    # energies = np.array(energies)/np.array(pars.lmbvals)
+    # energieserr = np.array(energieserr)/np.array(pars.lmbvals)
+    pypl.errorbar(pars.lmbvals,energies,energieserr, fmt='.', capsize=4, elinewidth=1, color=pars.colors[0], marker=pars.markers[1], markerfacecolor='none')
+    # pypl.legend(fontsize='x-small')
+    pypl.xlabel(r'$\lambda$',labelpad=14,fontsize=18)
+    pypl.ylabel(r'$\Delta E_{'+['u','d'][quarknum]+', \gamma_{'+op[1:]+'}}$',labelpad=5,fontsize=18)
+    pypl.title(r'Energy shift '+pars.momfold[pars.momentum][:7]+r', $\gamma_{'+op[1:]+r'}$')
+    # pypl.ylim([[-5,-1.9],[-3.3,-0.9]][quarknum])
+    # pypl.xlim(0,1e-1)
+    # pypl.xscale("log")
+    pypl.legend(fontsize='small')
+    pypl.grid(True, alpha=0.4)
+    ax = pypl.gca()
+    pypl.subplots_adjust(bottom=0.17, top=.91, left=0.16, right=0.93)
+    pypl.savefig(fold + 'Eff_dEshift_lambda_' + pars.momfold[pars.momentum][:7] + pars.snkfold[pars.sink] +'_'+op+'q'+str(quarknum+1)+'.pdf')
+    # pypl.show()
+    pypl.close()
+    return 
 
-def writefitdata(filename, headernames, data):
-    """filename to be written to, headernames to print in the first row, data of same length as headernames"""
-    with open(filename,'w') as csvfile:
-        datawrite = csv.writer(csvfile,delimiter=',',quotechar='|')
-        datawrite.writerow(headernames)
-        for item in data:
-            datawrite.writerow(item)
-    return
 
 def effmassplotter(ydata, fitrange, fitdata, fold, name, fitfnc, redchisq):
     """Plot the fit to the FH ratio and the data itself"""
@@ -541,8 +640,12 @@ def effamp(pars, ydata, plot=False,timeslice=10, FH=False):
 
 def makeratio(nclns, opnum):
     """Construct the ratio of correlators"""
-    ratiou = stats.feynhellratioshort(nclns[1][0], nclns[0][0])
-    ratiod = stats.feynhellratioshort(nclns[2][0], nclns[0][0])
+    # ratiou = stats.feynhellratio(nclns[1][0], nclns[0][1], nclns[0][0], nclns[1][1])
+    # ratiod = stats.feynhellratio(nclns[2][0], nclns[0][1], nclns[0][0], nclns[2][1])
+    ratiou = stats.feynhellratio(nclns[1][0], nclns[0][1], nclns[0][0], nclns[1][1])
+    ratiod = stats.feynhellratio(nclns[2][0], nclns[0][1], nclns[0][0], nclns[2][1])
+    # ratiou = stats.feynhellratioshort(nclns[1][0], nclns[0][0])
+    # ratiod = stats.feynhellratioshort(nclns[2][0], nclns[0][0])
     ratios = [ratiou, ratiod]
     # Take the average of the (pos. parity, trev=0) and (neg parity, trev=1) two-point functions to get an energy value
     unpert_2p =[]
@@ -564,7 +667,7 @@ if __name__ == "__main__":
         
         momentum     = int(sys.argv[1])
         kappas       = int(sys.argv[2])
-        quarknum = int(sys.argv[3])
+        quarknum     = int(sys.argv[3])
         sinktype=0
         pars = pr.params(kappas, sinktype, momentum)
         pars.fit = 'Aexp'
@@ -573,22 +676,56 @@ if __name__ == "__main__":
         opnum=0
         fitfunction  = ff.initffncs(pars.fit) #Initialise the fitting function
         
-        pars.lmbstring = 'lp025'
-        # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        nucleon_datalp025 = read_data(pars)
-        ratioslp025, unpert_2plp025 = makeratio(nucleon_datalp025,opnum)
-        dictenergylp025, dictenergyshiftlp025 = oneexpreader(pars,opnum)
-        
-        pars.lmbstring = 'lp05'
-        # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        nucleon_datalp05 = read_data(pars)
-        ratioslp05, unpert_2plp05 = makeratio(nucleon_datalp05,opnum)
-        dictenergylp05, dictenergyshiftlp05 = oneexpreader(pars,opnum)
+        # pars.lmbstring = 'lp001'
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp001 = read_data(pars)
+        # ratioslp001, unpert_2plp001 = makeratio(nucleon_datalp001,opnum)
+        # dictenergylp001, dictenergyshiftlp001 = oneexpreader(pars,opnum)
 
-        # Function which plots results from both lambdas on the same plot, for
-        # quarknum = 0 #up quark
-        plotratios(ratioslp025, ratioslp05, dictenergyshiftlp025[quarknum], dictenergyshiftlp05[quarknum], fitfunction, pars, opnum, quarknum)
+        # pars.lmbstring = 'lp01'
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp01 = read_data(pars)
+        # ratioslp01, unpert_2plp01 = makeratio(nucleon_datalp01,opnum)
+        # dictenergylp01, dictenergyshiftlp01 = oneexpreader(pars,opnum)
+
+        # pars.lmbstring = 'lp02'
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp02 = read_data(pars)
+        # ratioslp02, unpert_2plp02 = makeratio(nucleon_datalp02,opnum)
+        # dictenergylp02, dictenergyshiftlp02 = oneexpreader(pars,opnum)
         
+        # pars.lmbstring = 'lp04'
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp04 = read_data(pars)
+        # ratioslp04, unpert_2plp04 = makeratio(nucleon_datalp04,opnum)
+        # dictenergylp04, dictenergyshiftlp04 = oneexpreader(pars,opnum)
+
+        # pars.lmbstring = 'lp08'
+        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+        # nucleon_datalp08 = read_data(pars)
+        # ratioslp08, unpert_2plp08 = makeratio(nucleon_datalp08,opnum)
+        # dictenergylp08, dictenergyshiftlp08 = oneexpreader(pars,opnum)
+
+        # # Function which plots results from both lambdas on the same plot, for
+        # plotratios(ratioslp02, ratioslp01, dictenergyshiftlp02[quarknum], dictenergyshiftlp01[quarknum], fitfunction, pars, opnum, quarknum)
+        # # plotratios(ratioslp001, ratioslp0001, dictenergyshiftlp001[quarknum], dictenergyshiftlp0001[quarknum], fitfunction, pars, opnum, quarknum)
+
+        ratiolist = []
+        dictenergyshiftlist = []
+        for lmbstring in pars.lmblist:
+            pars.lmbstring = lmbstring
+            # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
+            nucleon_data = read_data(pars)
+            ratioslp, unpert_2plp = makeratio(nucleon_data,opnum)
+            ratiolist.append(ratioslp.copy())
+            dictenergylp, dictenergyshiftlp = oneexpreader(pars,opnum)
+            dictenergyshiftlist.append(dictenergyshiftlp[quarknum])
+
+        # print(f"{np.shape(ratiolist)=}")
+        # print(f"{np.shape(dictenergyshiftlist)=}")
+        # print(f"{dictenergyshiftlist=}")
+        plotratiosloop(ratiolist, dictenergyshiftlist, fitfunction, pars, opnum, quarknum)
+        plotlambdadep(dictenergyshiftlist, pars, opnum, quarknum)
         print('script time: \t', tm.time()-start)
     else:
         print("arg[1] = momentum")
