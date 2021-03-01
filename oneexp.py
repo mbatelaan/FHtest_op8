@@ -224,34 +224,6 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     #-----------------------------------------------------------------------------
     return 
 
-
-
-def writeBS(filename, headernames, bootstraps):
-    """filename to be written to, headernames to print in the first row, bootstraps a list of bootstrap elements of the same length as headernames."""
-    with open(filename,'w') as csvfile:
-        datawrite = csv.writer(csvfile,delimiter=',',quotechar='|')
-        datawrite.writerow(headernames)
-        for i in range(bootstraps[-1].nboot):
-            datawrite.writerow([bs.values[i] for bs in bootstraps])
-    return
-
-def writedata(filename, headernames, data):
-    """filename to be written to, headernames to print in the first row, data of same length as headernames"""
-    with open(filename,'w') as csvfile:
-        datawrite = csv.writer(csvfile,delimiter=',',quotechar='|')
-        datawrite.writerow(headernames)
-        datawrite.writerow(data)
-    return
-
-def writefitdata(filename, headernames, data):
-    """filename to be written to, headernames to print in the first row, data of same length as headernames"""
-    with open(filename,'w') as csvfile:
-        datawrite = csv.writer(csvfile,delimiter=',',quotechar='|')
-        datawrite.writerow(headernames)
-        for item in data:
-            datawrite.writerow(item)
-    return
-
 def effmassplotter(ydata, fitrange, fitdata, fold, name, fitfnc, redchisq):
     """Plot the fit to the FH ratio and the data itself"""
     time    = np.arange(0,len(ydata))
@@ -483,45 +455,6 @@ if __name__ == "__main__":
             nucleon_data = read_data(pars)
             ratios, unpert_2p = makeratio(nucleon_data,opnum)
             dictenergy, dictenergyshift = oneexpfitter(ratios, unpert_2p, fitfunction, pars, opnum, plots=0)
-        
-        # pars.lmbstring = 'lp001'
-        # print(pars.lmbstring)
-        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        # nucleon_datalp001 = read_data(pars)
-        # ratioslp001, unpert_2plp001 = makeratio(nucleon_datalp001,opnum)
-        # dictenergylp001, dictenergyshiftlp001 = oneexpfitter(ratioslp001, unpert_2plp001, fitfunction, pars, opnum, plots=0)
-
-        # pars.lmbstring = 'lp01'
-        # print(pars.lmbstring)
-        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        # nucleon_datalp01 = read_data(pars)
-        # ratioslp01, unpert_2plp01 = makeratio(nucleon_datalp01,opnum)
-        # dictenergylp01, dictenergyshiftlp01 = oneexpfitter(ratioslp01, unpert_2plp01, fitfunction, pars, opnum, plots=0)
-
-        # pars.lmbstring = 'lp02'
-        # print(pars.lmbstring)
-        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        # nucleon_datalp02 = read_data(pars)
-        # ratioslp02, unpert_2plp02 = makeratio(nucleon_datalp02,opnum)
-        # dictenergylp02, dictenergyshiftlp02 = oneexpfitter(ratioslp02, unpert_2plp02, fitfunction, pars, opnum, plots=0)
-        
-        # pars.lmbstring = 'lp04'
-        # print(pars.lmbstring)
-        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        # nucleon_datalp04 = read_data(pars)
-        # ratioslp04, unpert_2plp04 = makeratio(nucleon_datalp04,opnum)
-        # dictenergylp04, dictenergyshiftlp04 = oneexpfitter(ratioslp04, unpert_2plp04, fitfunction, pars, opnum, plots=0)
-        
-        # pars.lmbstring = 'lp08'
-        # print(pars.lmbstring)
-        # # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
-        # nucleon_datalp08 = read_data(pars)
-        # ratioslp08, unpert_2plp08 = makeratio(nucleon_datalp08,opnum)
-        # dictenergylp08, dictenergyshiftlp08 = oneexpfitter(ratioslp08, unpert_2plp08, fitfunction, pars, opnum, plots=0)
-        
-        # Function which plots results from both lambdas on the same plot, for
-        # quarknum = 0 #up quark
-        # plotratios(ratioslp025, ratioslp01, dictenergyshiftlp025[quarknum], dictenergyshiftlp01[quarknum], fitfunction, pars, opnum, quarknum)
         
         print('script time: \t', tm.time()-start)
     else:
