@@ -199,6 +199,33 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
     pypl.close()
     return 
 
+def weightedfits(ratiolist, dictenergyshift, fitfnc, pars, opnum, quarknum, lmbnum):
+    """ Plot the effective mass of the ratio of correlators for both lambdas and plot their fits """
+    op      = pars.operators[opnum]
+    #INFO: Calculate weights for each fit here.(in functions)
+    weights_dE = weights([dictenergyshift[lmbnum][i]['dof'] for i in dictenergyshift[lmbnum]]
+                            , [dictenergyshift[lmbnum][i]['chisq'] for i in dictenergyshift[lmbnum]]
+                            , [np.std(dictenergyshift[lmbnum][i]['E0'], ddof=1) for i in dictenergyshift[lmbnum]] )
+    weighted_dE = (np.array(weights_dE)*np.array([dictenergyshift[lmbnum][i]['E0'] for i in dictenergyshift[lmbnum]]).T).T
+    avgdE = np.sum(weighted_dE, axis=0)
+    meanavgdE = np.average(avgdE)
+    staterrsq_dE = np.std(avgdE,ddof=1)**2
+    # The square of the differences of each fit mean to the weighted average mean
+    mean_diff = np.array([(np.average(dictenergyshift[lmbnum][i]['E0'])-meanavgdE)**2 for i in dictenergyshift[lmbnum]])
+    # The systematic error due to taking multiple fit results in the average
+    systerrsq_dE = np.sum(weights_dE*mean_diff)
+    # The combined error includes the statistical and systematic uncertainty
+    comberr_dE = np.sqrt(staterrsq_dE+systerrsq_dE)
+    # Rescale the bootstrap values such that the standard deviation of the bootstrap values is equal to the combined error, without changing the mean value of the bootstraps
+    for nboot in range(len(avgdE)):
+        avgdE[nboot] = meanavgdE+(avgdE[nboot]-meanavgdE)*comberr_dE/(staterrsq_dE**(0.5))
+    
+    # Save the energy fit to the pickle file 
+    energyfitfile = pars.data_dir + 'energyweightedavg_' + op +'_q'+str(quarknum+1)+'_'+ pars.momfold[pars.momentum][:7]+'_'+pars.fit + pars.snkfold[pars.sink] + '_' + pars.lmblist[lmbnum]+ '.pkl'
+    with open(energyfitfile, 'wb') as fileout:
+        pickle.dump(avgdE, fileout)
+    return avgdE
+
 def plotratiosloop(ratiolist, dictenergyshift, fitfnc, pars, opnum, quarknum):
     """ Plot the effective mass of the ratio of correlators for both lambdas and plot their fits """
     op      = pars.operators[opnum]
@@ -268,6 +295,7 @@ def plotratiosloop(ratiolist, dictenergyshift, fitfnc, pars, opnum, quarknum):
     pypl.savefig(fold + 'Eff_dEshift_' + pars.momfold[pars.momentum][:7] + pars.snkfold[pars.sink] +'_'+op+'q'+str(quarknum+1)+'.pdf')
     pypl.close()
     return 
+
 
 def plotlambdadep(dictenergyshift, pars, opnum, quarknum):
     """ Plot the effective mass of the ratio of correlators for both lambdas and plot their fits """
@@ -360,7 +388,7 @@ if __name__ == "__main__":
 
         ratiolist = []
         dictenergyshiftlist = []
-        for lmbstring in pars.lmblist:
+        for lmbnum, lmbstring in enumerate(pars.lmblist):
             pars.lmbstring = lmbstring
             # Read the Bootstrap objects from the files. (Make sure self.nboot is set to the desired value in params.py)
             nucleon_data = read_data(pars)
@@ -368,7 +396,10 @@ if __name__ == "__main__":
             ratiolist.append(ratioslp.copy())
             dictenergylp, dictenergyshiftlp = oneexpreader(pars,opnum)
             dictenergyshiftlist.append(dictenergyshiftlp[quarknum])
-
+        avgdE = []
+        for lmbnum, lmbstring in enumerate(pars.lmblist):
+            avgdE.append(weightedfits(ratiolist, dictenergyshiftlist, fitfunction, pars, opnum, quarknum, lmbnum))
+            
         plotratiosloop(ratiolist, dictenergyshiftlist, fitfunction, pars, opnum, quarknum)
         plotlambdadep(dictenergyshiftlist, pars, opnum, quarknum)
         print('script time: \t', tm.time()-start)
