@@ -6,6 +6,7 @@ class params:
     # beta=5.50
     # 32x64
     from ._kp120900kp120900 import kp120900kp120900
+    from ._kp120900kp120900cosine import kp120900kp120900cosine
     
     def __init__(self, kappas, sinktype, momentum=None):
         """
@@ -28,15 +29,16 @@ class params:
         self.quarks     = ['u','d']
         self.operators  = ['g4']
         self.opchoice   = [0]
-        self.tminmin     = 3#3
-        self.tminmax     = 14
-        self.tmaxmin     = 12
-        self.tmaxmax     = 16
+        self.tminmin     = 2 #3
+        self.tminmax     = 10
+        self.tmaxmin     = 8
+        self.tmaxmax     = 10
         self.ff_number   = 0
         self.datafiles = ['Ratio_fit', 'One-exp_fit', 'corr_fit', 'combined_corr_fit', 'wa_weightedavg']
 
         self.latticefn = [
             self.kp120900kp120900, #0
+            self.kp120900kp120900cosine, #1
             # self.kp121040kp121040, #1
             # self.kp121040kp120620, #2
             # self.kp120620kp121040, #3
@@ -58,12 +60,15 @@ class params:
             ]
         self.latticefn[self.kappas]()
         
-        self.workdir    = self.basedir+self.beta+self.lattice[-17:-1]+self.csw+'/'+self.kappa+self.snkfold[0]+'/'  # Folder for the current lattice and sink type
+        if self.kappas==1:
+            self.workdir    = self.basedir+self.beta+self.lattice[-17:-1]+self.csw+'/'+self.kappa+self.snkfold[0]+'cosine/'  # Folder for the current lattice and sink type
+        else:
+            self.workdir    = self.basedir+self.beta+self.lattice[-17:-1]+self.csw+'/'+self.kappa+self.snkfold[0]+'/'  # Folder for the current lattice and sink type
 
         # Folders for pandapickle:
         # self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/FHtest2/'  # folder with evxpt resultdump files
         # self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/Feyn-Hell_kp120900kp120900/clover_nf2p1_feyn-hell/b5p50kp120900kp120900c2p6500-32x64/nucleon/kp120900kp120900/mass/rel/FHtest2/'
-        self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/Feyn-Hell_kp120900kp120900/clover_nf2p1_feyn-hell/b5p50kp120900kp120900c2p6500_g8-32x64/nucleon/kp120900kp120900/mass/'
+        self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/Feyn-Hell_kp120900kp120900/clover_nf2p1_feyn-hell/b5p50kp120900kp120900c2p6500_g8-32x64/nucleon/kp120900kp120900/'
         # self.evxptdir     = '/home/mischa/Documents/PhD/lattice_results/FHtest2/'  # folder with evxpt resultdump files
         self.sinkfold     = self.beta+self.lattice[-17:-1]+self.csw+self.snkfold[0]+'-'+self.geom+'/nucleon/'+self.kappa+'/'  # Location of the unperturbed correlators
         
@@ -74,10 +79,10 @@ class params:
 
     def makeresultdir(self, plots=None):
         if self.momentum!=None:
-            self.data_dir     = self.workdir+ self.fit +'/'+self.momfold[self.momentum][:7]+'/data_'+str(self.nboot)+'/'  # Folder where the fitting data will be saved
-            self.fit_data_dir = self.workdir+self.fit +'/'+self.momfold[self.momentum][:7]+'/fit_data_'+str(self.nboot)+'/'  # Folder where the complete fitting data will be saved
-            self.plot_dir     = [ [self.workdir+self.fit+'/'+self.momfold[self.momentum][:7]+'/plots/'+ op + '_quark1/',
-                                   self.workdir+self.fit+'/'+self.momfold[self.momentum][:7]+'/plots/'+ op + '_quark2/'] for op in self.operators ]   # Folders where the plots will be saved
+            self.data_dir     = self.workdir+ self.fit +'/'+self.momfold[self.momentum][:8]+'data_'+str(self.nboot)+'/'  # Folder where the fitting data will be saved
+            self.fit_data_dir = self.workdir+self.fit +'/'+self.momfold[self.momentum][:8]+'fit_data_'+str(self.nboot)+'/'  # Folder where the complete fitting data will be saved
+            self.plot_dir     = [ [self.workdir+self.fit+'/'+self.momfold[self.momentum][:8]+'plots/'+ op + '_quark1/',
+                                   self.workdir+self.fit+'/'+self.momfold[self.momentum][:8]+'plots/'+ op + '_quark2/'] for op in self.operators ]   # Folders where the plots will be saved
         else:
             self.data_dir     = self.workdir+ self.fit +'/data_'+str(self.nboot)+'/'  # Folder where the fitting data will be saved
             #self.fit_data_dir = self.workdir+self.fit +'/fit_data_'+str(self.nboot)+'/'  # Folder where the complete fitting data will be saved

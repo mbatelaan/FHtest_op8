@@ -1,6 +1,6 @@
 import numpy as np
 
-def kp120900kp120900(self):
+def kp120900kp120900cosine(self):
     ### -----kp120900kp120900-----
     self.lattice      = 'Feyn-Hell_kp120900kp120900/'
     self.kappa        = 'kp120900kp120900'
@@ -13,8 +13,8 @@ def kp120900kp120900(self):
     # self.lmbvals      = [0.0001, 0.001, 0.005, 0.01, 0.02, 0.04, 0.08]
     # self.lmblist      = ['lp025', 'lp05']
     # self.lmbvals      = [0.025, 0.05]
-    self.lmblist      = ['lp001', 'lp01', 'lp025', 'lp05']
-    self.lmbvals      = [0.001, 0.01, 0.025, 0.05]
+    self.lmblist      = ['lp05']
+    self.lmbvals      = [0.05]
     self.almb         = 2.5e-2
     self.a            = 0.074
     self.baryons      = {"proton" : ["p", [2/3, -1/3], [(-0.2,1.2), (-0.1,1.1), (-0.4,0.7), (-0.1,1.1), (-0.1,1.1)]], #Baryon type, electric charge, ylimits GE, GM, GE/GM, F1, F2

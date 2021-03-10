@@ -201,16 +201,19 @@ def plotratios(ratios1, ratios2, dictenergyshift1, dictenergyshift2, fitfnc, par
 
 def weightedfits(ratiolist, dictenergyshift, fitfnc, pars, opnum, quarknum, lmbnum):
     """ Plot the effective mass of the ratio of correlators for both lambdas and plot their fits """
-    op      = pars.operators[opnum]
-    #INFO: Calculate weights for each fit here.(in functions)
+    op  = pars.operators[opnum]
+    # Calculate weights for the energy shift from each fit
     weights_dE = weights([dictenergyshift[lmbnum][i]['dof'] for i in dictenergyshift[lmbnum]]
                             , [dictenergyshift[lmbnum][i]['chisq'] for i in dictenergyshift[lmbnum]]
                             , [np.std(dictenergyshift[lmbnum][i]['E0'], ddof=1) for i in dictenergyshift[lmbnum]] )
+    # Multiply the weights with the energy shift values to get an array of weighted values, then sum over the array (Bootstrap by bootstrap).
     weighted_dE = (np.array(weights_dE)*np.array([dictenergyshift[lmbnum][i]['E0'] for i in dictenergyshift[lmbnum]]).T).T
     avgdE = np.sum(weighted_dE, axis=0)
+    # Take the average over the bootstraps
     meanavgdE = np.average(avgdE)
+    # Calculate the statistical error squared
     staterrsq_dE = np.std(avgdE,ddof=1)**2
-    # The square of the differences of each fit mean to the weighted average mean
+    # The square of the differences of each mean energy to the weighted average mean
     mean_diff = np.array([(np.average(dictenergyshift[lmbnum][i]['E0'])-meanavgdE)**2 for i in dictenergyshift[lmbnum]])
     # The systematic error due to taking multiple fit results in the average
     systerrsq_dE = np.sum(weights_dE*mean_diff)
@@ -285,8 +288,11 @@ def plotratiosloop(ratiolist, dictenergyshift, fitfnc, pars, opnum, quarknum):
     pypl.legend(fontsize='x-small')
     pypl.xlabel(r'$\textrm{t/a}$',labelpad=14,fontsize=18)
     pypl.ylabel(r'$\Delta E_{'+['u','d'][quarknum]+', \gamma_{'+op[1:]+'}}/\lambda$',labelpad=5,fontsize=18)
-    pypl.title(r'Energy shift '+pars.momfold[pars.momentum][:7]+r', $\gamma_{'+op[1:]+r'}$')
-    pypl.ylim([[-5,-1.9],[-3.3,-0.9]][quarknum])
+    # r'$q='+np.array2string(pars.qval[3], separator=', ')+'$'
+    pypl.title(r'Energy shift '+r'$q='+np.array2string(pars.qval[pars.momentum], separator=', ')+'$'+r', $\gamma_{'+op[1:]+r'}$')
+    # pypl.title(r'Energy shift '+pars.momfold[pars.momentum][:7]+r', $\gamma_{'+op[1:]+r'}$')
+    # pypl.ylim([[-5,-1.9],[-3.3,-0.9]][quarknum])
+    pypl.ylim([[-3.3,0.9],[-3.3,0.9]][quarknum])
     pypl.xlim(0,28)
     pypl.legend(fontsize='small')
     pypl.grid(True, alpha=0.4)
